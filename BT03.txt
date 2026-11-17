@@ -1,0 +1,39 @@
+
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+contract Bank {
+    address private accOwner;
+    uint256 private balance = 0;
+
+    constructor() {
+        accOwner = msg.sender;
+    }
+
+    // Deposit Ether into the account
+    function Deposit() public payable {
+        require(accOwner == msg.sender, "You are not the account owner!");
+        require(msg.value > 0, "Amount should be greater than 0.");
+
+        balance += msg.value;
+    }
+
+    // Withdraw Ether from the account
+    function Withdraw(uint256 amount) public {
+        require(accOwner == msg.sender, "You are not the account owner!");
+        require(amount > 0, "Amount should be greater than 0.");
+        require(amount <= balance, "Insufficient account balance!");
+
+        balance -= amount;
+
+        (bool success, ) = payable(accOwner).call{value: amount}("");
+        require(success, "Transfer failed!");
+    }
+
+    // Display account balance
+    function showBalance() public view returns (uint256) {
+        require(accOwner == msg.sender, "You are not the account owner!");
+
+        return balance;
+    }
+}
